@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\ItemController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,11 +32,14 @@ Route::namespace('Api\V1')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('logout', [AuthController::class, 'logout']);
 
-            Route::post('category', [CategoryController::class, 'store']);
             Route::get('category', [CategoryController::class, 'index']);
+            Route::post('category', [CategoryController::class, 'store']);
             Route::get('category/{category}', [CategoryController::class, 'show']);
-            Route::delete('category/{category}', [CategoryController::class, 'destroy']);
             Route::put('category/{category}', [CategoryController::class, 'update']);
+            Route::delete('category/{category}', [CategoryController::class, 'destroy']);
+
+
+            Route::post('item', [ItemController::class, 'store']);
 
             // Route::post('logout', 'AuthController@logout');
             //     Route::get('profile', 'PageController@profile');

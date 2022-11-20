@@ -40,6 +40,10 @@ Route::namespace('Api\V1')->group(function () {
 
 
             Route::post('item', [ItemController::class, 'store']);
+            Route::get('item', [ItemController::class, 'index']);
+            Route::get('item/{item}', [ItemController::class, 'show']);
+            Route::put('item/{item}', [ItemController::class, 'update']);
+            Route::delete('item/{item}', [ItemController::class, 'destroy']);
 
             // Route::post('logout', 'AuthController@logout');
             //     Route::get('profile', 'PageController@profile');

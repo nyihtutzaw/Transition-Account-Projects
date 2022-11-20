@@ -23,7 +23,15 @@ class ItemController extends Controller
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+        $items = $user->items->sortByDesc('created_at');
+        $data = ItemResource::collection($items);
+        $perPage = request()->input('limit', 10);
+        $currentPage = request()->input('page', 1);
+        $total = ceil(count($items) / $perPage);
+        $currentPageItems = $data->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+        return response()->json(["status" => "success", "data" => $currentPageItems, "total" => count($items), 'current_page' => $currentPage, 'items_per_page' => $perPage, 'total_pages' => $total]);
     }
 
     /**
@@ -44,9 +52,6 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        // return $request->all();
-
-        // DB::beginTransaction();
         try {
             $user = Auth::user();
 
@@ -65,21 +70,8 @@ class ItemController extends Controller
             $item->save();
             $data = new ItemResource($item);
             return success('Success', $data);
-            // DB::commit();
-            // return jsend_success(new ItemResource($item), JsonResponse::HTTP_CREATED);
         } catch (Exception $ex) {
-            return "error";
-
-            // DB::rollBack();
-            // Log::error(__('api.saved-failed', ['model' => class_basename(Item::class)]), [
-            //     'code' => $ex->getCode(),
-            //     'trace' => $ex->getTrace(),
-            // ]);
-
-            // return jsend_error(__('api.saved-failed', ['model' => class_basename(Item::class)]), [
-            //     $ex->getCode(),
-            //     ErrorType::SAVE_ERROR,
-            // ]);
+            return fail("Please try again!", null);
         }
     }
 
@@ -89,9 +81,10 @@ class ItemController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Item $item)
     {
-        //
+        $data = new ItemResource($item);
+        return success('Success', $data);
     }
 
     /**
@@ -114,7 +107,26 @@ class ItemController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $user = Auth::user();
+            $category_id = trim($request->get(self::CATEGORY_ID));
+            $name = trim($request->get(self::NAME));
+            $quantity = trim($request->get(self::QUANTITY));
+            $acceptor = trim($request->get(self::ACCEPTOR));
+
+            $item = Item::findOrFail($id);
+            $item->category_id = $category_id;
+            $item->name = $name;
+            $item->quantity = $quantity;
+            $item->acceptor = $acceptor;
+            $item->user_id = $user->id;
+
+            $item->update();
+            $data = new ItemResource($item);
+            return success('Success', $data);
+        } catch (Exception $ex) {
+            return fail("Please try again!", null);
+        }
     }
 
     /**
@@ -125,6 +137,12 @@ class ItemController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $item = Item::findOrFail($id);
+            $item->delete();
+            return success('Success deleted', null);
+        } catch (Exception $ex) {
+            return fail('Please try again!', null);
+        }
     }
 }

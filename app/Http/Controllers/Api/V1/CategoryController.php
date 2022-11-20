@@ -120,6 +120,7 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         try {
+            $category = Category::findOrFail($category->id);
             $category->delete();
             return success('Success deleted', null);
         } catch (Exception $ex) {

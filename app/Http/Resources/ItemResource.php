@@ -17,8 +17,7 @@ class ItemResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            // 'acceptory' => $this->acceptor,
-            'category' => $this->category ? $this->category->id : "",
+            'category' => $this->category ? $this->category->name : "",
             'created_at' => $this->created_at,
         ];
     }

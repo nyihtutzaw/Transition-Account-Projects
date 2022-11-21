@@ -9,8 +9,10 @@ class Stock extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['item_id', 'category_id', 'user_id', 'acceptor', 'quantity'];
+
     public function items()
     {
-        return $this->hasMany(Item::class, 'id');
+        return $this->belongsTo(Item::class, 'item_id');
     }
 }

@@ -14,7 +14,7 @@ class AddAcceptorToItemsTable extends Migration
     public function up()
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->string('acceptor')->after('user_id');
+            // $table->string('acceptor')->after('user_id');
             
         });
     }

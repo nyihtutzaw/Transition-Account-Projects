@@ -8,6 +8,7 @@ use App\Models\Item;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ItemController extends Controller
 {
@@ -57,14 +58,14 @@ class ItemController extends Controller
 
             $category_id = trim($request->get(self::CATEGORY_ID));
             $name = trim($request->get(self::NAME));
-            $quantity = trim($request->get(self::QUANTITY));
-            $acceptor = trim($request->get(self::ACCEPTOR));
+            // $quantity = trim($request->get(self::QUANTITY));
+            // $acceptor = trim($request->get(self::ACCEPTOR));
 
             $item = new Item();
             $item->category_id = $category_id;
             $item->name = $name;
-            $item->quantity = $quantity;
-            $item->acceptor = $acceptor;
+            // $item->quantity = $quantity;
+            // $item->acceptor = $acceptor;
             $item->user_id = $user->id;
 
             $item->save();
@@ -105,29 +106,70 @@ class ItemController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function update(Request $request, $id)
     {
+        $user = Auth::user();
+        $category_id = trim($request->get(self::CATEGORY_ID));
+        $name = trim($request->get(self::NAME));
         try {
-            $user = Auth::user();
-            $category_id = trim($request->get(self::CATEGORY_ID));
-            $name = trim($request->get(self::NAME));
-            $quantity = trim($request->get(self::QUANTITY));
-            $acceptor = trim($request->get(self::ACCEPTOR));
+            $item_new = Item::findOrFail($id);
+            $item_new->category_id = $category_id;
+            $item_new->name = $name;
+            $item_new->user_id = $user->id;
+            $item_new->save();
+            $data = new ItemResource($item_new);
 
-            $item = Item::findOrFail($id);
-            $item->category_id = $category_id;
-            $item->name = $name;
-            $item->quantity = $quantity;
-            $item->acceptor = $acceptor;
-            $item->user_id = $user->id;
-
-            $item->update();
-            $data = new ItemResource($item);
-            return success('Success', $data);
+            return success('Success Created', $data);
         } catch (Exception $ex) {
+            DB::rollBack();
             return fail("Please try again!", null);
         }
     }
+
+    // update Quantity for items
+    public function updateQuantity(Request $request, $id)
+    {
+        DB::beginTransaction();
+        $user = Auth::user();
+        $category_id = trim($request->get(self::CATEGORY_ID));
+        $name = trim($request->get(self::NAME));
+        $quantity = trim($request->get(self::QUANTITY));
+        $acceptor = trim($request->get(self::ACCEPTOR));
+
+        try {
+            $item = Item::where('id', '=',  $id)->first();
+            if ($item === null) {
+                $item_new = new Item();
+                $item_new->category_id = $category_id;
+                $item_new->name = $name;
+                $item_new->quantity = $quantity;
+                $item_new->acceptor = $acceptor;
+                $item_new->user_id = $user->id;
+                $item_new->save();
+                $data = new ItemResource($item_new);
+                DB::commit();
+
+                return success('Success Created', $data);
+            } else {
+                $item->category_id = $category_id;
+                $item->name = $name;
+                $item->user_id = $user->id;
+                $item->acceptor = $acceptor;
+                $item->quantity += $quantity;
+                $item->save();
+                $data = new ItemResource($item);
+                DB::commit();
+
+                return success('Success Updated', $data);
+            }
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return fail("Please try again!", null);
+        }
+    }
+
+
 
     /**
      * Remove the specified resource from storage.

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddQuantityToItemsTable extends Migration
+class AddUserIdToStocksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class AddQuantityToItemsTable extends Migration
      */
     public function up()
     {
-        Schema::table('items', function (Blueprint $table) {
-            // $table->string('quantity')->after('user_id');
-            
+        Schema::table('stocks', function (Blueprint $table) {
+            $table->bigInteger('user_id')->unsigned()->after('item_id');
+            $table->foreign('user_id')
+                ->references('id')->on('users')
+                ->onDelete('cascade');
         });
     }
 
@@ -26,7 +28,7 @@ class AddQuantityToItemsTable extends Migration
      */
     public function down()
     {
-        Schema::table('items', function (Blueprint $table) {
+        Schema::table('stocks', function (Blueprint $table) {
             //
         });
     }

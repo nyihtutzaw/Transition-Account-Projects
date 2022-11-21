@@ -53,5 +53,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Category::class, 'user_id');
     }
+
+    public function stocks()
+    {
+        return $this->hasMany(Stock::class, 'user_id');
+    }
     
 }

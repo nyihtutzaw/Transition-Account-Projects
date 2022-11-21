@@ -14,6 +14,8 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
+        // return $request->all();
+
         $request->validate(
             [
                 'name' => ['required', 'string', 'max:255'],
@@ -28,8 +30,8 @@ class AuthController extends Controller
         // $user->phone = $request->phone;
         $user->password = Hash::make($request->password);
         $user->save();
-        $token = $user->createToken('Transitions')->accessToken;
-        return success('Successfully Registered.', ['token' => $token]);
+        // $token = $user->createToken('Transitions')->accessToken;
+        return success('Successfully Registered.', null);
     }
 
 

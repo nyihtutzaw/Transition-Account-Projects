@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\ItemController;
+use App\Http\Controllers\Api\V1\StockController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +45,14 @@ Route::namespace('Api\V1')->group(function () {
             Route::get('item/{item}', [ItemController::class, 'show']);
             Route::put('item/{item}', [ItemController::class, 'update']);
             Route::delete('item/{item}', [ItemController::class, 'destroy']);
+            // Route::put('item-quantity/{item}', [ItemController::class, 'updateQuantity']);
+
+            Route::post('stock', [StockController::class, 'store']);
+            Route::get('stock', [StockController::class, 'index']);
+            Route::get('stock/{stock}', [StockController::class, 'show']);
+            Route::put('stock/{stock}', [StockController::class, 'update']);
+            Route::delete('stock/{stock}', [StockController::class, 'destroy']);
+
 
             // Route::post('logout', 'AuthController@logout');
             //     Route::get('profile', 'PageController@profile');

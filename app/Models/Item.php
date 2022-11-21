@@ -21,4 +21,9 @@ class Item extends Model
     {
         return $this->hasMany(Stock::class, 'item_id');
     }
+
+    public function outStocks()
+    {
+        return $this->hasMany(OutStock::class, 'item_id');
+    }
 }

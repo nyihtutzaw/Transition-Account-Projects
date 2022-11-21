@@ -58,5 +58,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Stock::class, 'user_id');
     }
-    
+
+    public function outStocks()
+    {
+        return $this->hasMany(OutStock::class, 'user_id');
+    }
+
+    public function damageItems()
+    {
+        return $this->hasMany(DamageItem::class, 'user_id');
+    }
 }

@@ -4,8 +4,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\DamageItemController;
 use App\Http\Controllers\Api\V1\ItemController;
 use App\Http\Controllers\Api\V1\StockController;
+use App\Http\Controllers\Api\V1\OutStockController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,13 +35,14 @@ Route::namespace('Api\V1')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('logout', [AuthController::class, 'logout']);
 
+            // Categories Routing
             Route::get('category', [CategoryController::class, 'index']);
             Route::post('category', [CategoryController::class, 'store']);
             Route::get('category/{category}', [CategoryController::class, 'show']);
             Route::put('category/{category}', [CategoryController::class, 'update']);
             Route::delete('category/{category}', [CategoryController::class, 'destroy']);
 
-
+            // Items Routing
             Route::post('item', [ItemController::class, 'store']);
             Route::get('item', [ItemController::class, 'index']);
             Route::get('item/{item}', [ItemController::class, 'show']);
@@ -47,29 +50,26 @@ Route::namespace('Api\V1')->group(function () {
             Route::delete('item/{item}', [ItemController::class, 'destroy']);
             // Route::put('item-quantity/{item}', [ItemController::class, 'updateQuantity']);
 
+            // InStock Routing
             Route::post('stock', [StockController::class, 'store']);
             Route::get('stock', [StockController::class, 'index']);
             Route::get('stock/{stock}', [StockController::class, 'show']);
             Route::put('stock/{stock}', [StockController::class, 'update']);
             Route::delete('stock/{stock}', [StockController::class, 'destroy']);
 
+            // OutStock Routing
+            Route::post('out-stock', [OutStockController::class, 'store']);
+            Route::get('out-stock', [OutStockController::class, 'index']);
+            Route::get('out-stock/{stock}', [OutStockController::class, 'show']);
+            Route::put('out-stock/{stock}', [OutStockController::class, 'update']);
+            Route::delete('out-stock/{stock}', [OutStockController::class, 'destroy']);
 
-            // Route::post('logout', 'AuthController@logout');
-            //     Route::get('profile', 'PageController@profile');
-
-            //     Route::get('transaction', 'PageController@transaction');
-            //     Route::get('transaction/{trx_id}', 'PageController@transactionDetail');
-
-            //     Route::get('notification', 'PageController@notification');
-            //     Route::get('notification/{id}', 'PageController@notificationDetail');
-
-            //     Route::get('to-account-verify', 'PageController@toAccountVerify');
-            //     Route::get('transfer/confirm', 'PageController@transferConfirm');
-            //     Route::post('transfer/complete', 'PageController@transferComplete');
-
-            //     Route::get('scan-and-pay-form', 'PageController@scanAndPayForm');
-            //     Route::get('/scan-and-pay/confirm', 'PageController@scanAndPayConfirm');
-            //     Route::post('/scan-and-pay/complete', 'PageController@scanAndPayComplete');
+            // DamageItems Routing
+            Route::post('damage-item', [DamageItemController::class, 'store']);
+            Route::get('damage-item', [DamageItemController::class, 'index']);
+            Route::get('damage-item/{stock}', [DamageItemController::class, 'show']);
+            Route::put('damage-item/{stock}', [DamageItemController::class, 'update']);
+            Route::delete('damage-item/{stock}', [DamageItemController::class, 'destroy']);
         });
     });
 });

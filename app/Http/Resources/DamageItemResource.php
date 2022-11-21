@@ -16,7 +16,7 @@ class DamageItemResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => $this->items ? "ok" : "null",
             'created_at' => $this->created_at,
         ];
     }

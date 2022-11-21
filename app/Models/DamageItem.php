@@ -9,4 +9,6 @@ class DamageItem extends Model
 {
     use HasFactory;
     
+    protected $fillable = ['quantity', 'acceptor', 'item_id', 'user_id'];
+
 }

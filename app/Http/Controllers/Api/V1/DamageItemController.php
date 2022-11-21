@@ -25,7 +25,15 @@ class DamageItemController extends Controller
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+        $items = $user->damageItems->sortByDesc('created_at');
+        $data = DamageItemResource::collection($items);
+        $perPage = request()->input('limit', 10);
+        $currentPage = request()->input('page', 1);
+        $total = ceil(count($items) / $perPage);
+        $currentPageItems = $data->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+        return response()->json(["status" => "success", "data" => $currentPageItems, "total" => count($items), 'current_page' => $currentPage, 'items_per_page' => $perPage, 'total_pages' => $total]);
     }
 
     /**
@@ -58,7 +66,6 @@ class DamageItemController extends Controller
             $stock = DamageItem::where('item_id', '=',  $item_id)->first();
             if ($stock === null) {
                 $stock = new DamageItem();
-
                 $stock->item_id = $item_id;
                 $stock->quantity += $quantity;
                 $stock->acceptor = $acceptor;
@@ -102,9 +109,10 @@ class DamageItemController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(DamageItem $damage)
     {
-        //
+        $data = new DamageItemResource($damage);
+        return success('Success', $data);
     }
 
     /**
@@ -127,7 +135,26 @@ class DamageItemController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+
+        $user = Auth::user();
+        $quantity = trim($request->get(self::QUANTITY));
+        $acceptor = trim($request->get(self::ACCEPTOR));
+        $item_id = trim($request->get(self::ITEM_ID));
+
+        try {
+            $item_new = DamageItem::findOrFail($id);
+            $item_new->item_id = $item_id;
+
+            $item_new->quantity = $quantity;
+            $item_new->acceptor = $acceptor;
+            $item_new->user_id = $user->id;
+            $item_new->save();
+            $data = new DamageItemResource($item_new);
+
+            return success('Success Updated', $data);
+        } catch (Exception $ex) {
+            return fail("Please try again!", null);
+        }
     }
 
     /**
@@ -138,6 +165,12 @@ class DamageItemController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $item = DamageItem::findOrFail($id);
+            $item->delete();
+            return success('Success deleted', null);
+        } catch (Exception $ex) {
+            return fail('Please try again!', null);
+        }
     }
 }

@@ -24,6 +24,7 @@ class ItemController extends Controller
      */
     public function index()
     {
+        
         $user = Auth::user();
         $items = $user->items->sortByDesc('created_at');
         $data = ItemResource::collection($items);

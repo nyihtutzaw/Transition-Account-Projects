@@ -26,4 +26,9 @@ class Item extends Model
     {
         return $this->hasMany(OutStock::class, 'item_id');
     }
+
+    public function damageItems()
+    {
+        return $this->hasMany(DamageItem::class, 'item_id');
+    }
 }

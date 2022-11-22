@@ -74,7 +74,8 @@ class OutStockController extends Controller
                 $stock->user_id = $user->id;
                 $stock->save();
 
-                $old_stock = Stock::find($item_id);
+                // $old_stock = Stock::find($item_id);
+                $old_stock = Stock::where('item_id', '=', $item_id)->first();
                 $old_stock->quantity -= $quantity;
                 $old_stock->save();
 
@@ -91,7 +92,8 @@ class OutStockController extends Controller
                 $stock->user_id = $user->id;
                 $stock->save();
 
-                $old_stock = Stock::find($item_id);
+                // $old_stock = Stock::find($item_id);
+                $old_stock = Stock::where('item_id', '=', $item_id)->first();
                 $old_stock->quantity -= $quantity;
                 $old_stock->save();
 

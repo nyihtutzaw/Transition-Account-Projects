@@ -109,8 +109,9 @@ class DamageItemController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(DamageItem $damage)
+    public function show($id)
     {
+        $damage = DamageItem::findOrFail($id);
         $data = new DamageItemResource($damage);
         return success('Success', $data);
     }

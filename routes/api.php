@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\DamageItemController;
 use App\Http\Controllers\Api\V1\ItemController;
 use App\Http\Controllers\Api\V1\StockController;
 use App\Http\Controllers\Api\V1\OutStockController;
+use App\Http\Controllers\ReportItemController;
 
 /*
 |--------------------------------------------------------------------------
@@ -70,6 +71,10 @@ Route::namespace('Api\V1')->group(function () {
             Route::get('damage-item/{stock}', [DamageItemController::class, 'show']);
             Route::put('damage-item/{stock}', [DamageItemController::class, 'update']);
             Route::delete('damage-item/{stock}', [DamageItemController::class, 'destroy']);
+
+            //Report Item
+            Route::get('item-report', [ReportItemController::class, 'index']);
+
         });
     });
 });

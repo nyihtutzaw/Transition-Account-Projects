@@ -15,4 +15,9 @@ class Stock extends Model
     {
         return $this->belongsTo(Item::class, 'item_id');
     }
+
+    public function out_stocks()
+    {
+        return $this->hasMany(OutStock::class, 'stock_id');
+    }
 }

@@ -74,7 +74,7 @@ Route::namespace('Api\V1')->group(function () {
 
             //Report Item
             Route::get('item-report', [ReportItemController::class, 'index']);
-
+            Route::get('item-report-date', [ReportItemController::class, 'store']);
         });
     });
 });

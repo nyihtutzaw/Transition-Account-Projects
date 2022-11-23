@@ -17,6 +17,7 @@ class OutStockController extends Controller
     const QUANTITY = 'quantity';
     const ACCEPTOR = 'acceptor';
     const ITEM_ID   = 'item_id';
+    const STOCK_ID   = 'stock_id';
 
     /**
      * Display a listing of the resource.
@@ -54,13 +55,14 @@ class OutStockController extends Controller
      */
     public function store(Request $request)
     {
-        DB::beginTransaction();
 
+        DB::beginTransaction();
         $user = Auth::user();
         $category_id = trim($request->get(self::CATEGORY_ID));
         $quantity = trim($request->get(self::QUANTITY));
         $acceptor = trim($request->get(self::ACCEPTOR));
         $item_id = trim($request->get(self::ITEM_ID));
+        $stock_id = trim($request->get(self::STOCK_ID));
 
         try {
             $stock = OutStock::where('item_id', '=',  $item_id)->first();
@@ -69,12 +71,12 @@ class OutStockController extends Controller
                 $stock->category_id = $category_id;
 
                 $stock->item_id = $item_id;
+                $stock->stock_id = $stock_id;
                 $stock->quantity += $quantity;
                 $stock->acceptor = $acceptor;
                 $stock->user_id = $user->id;
                 $stock->save();
 
-                // $old_stock = Stock::find($item_id);
                 $old_stock = Stock::where('item_id', '=', $item_id)->first();
                 $old_stock->quantity -= $quantity;
                 $old_stock->save();
@@ -84,15 +86,14 @@ class OutStockController extends Controller
 
                 return success('Successfully Created', $data);
             } else {
-
                 $stock->category_id = $category_id;
                 $stock->item_id = $item_id;
+                $stock->stock_id = $stock_id;
                 $stock->quantity += $quantity;
                 $stock->acceptor = $acceptor;
                 $stock->user_id = $user->id;
                 $stock->save();
 
-                // $old_stock = Stock::find($item_id);
                 $old_stock = Stock::where('item_id', '=', $item_id)->first();
                 $old_stock->quantity -= $quantity;
                 $old_stock->save();

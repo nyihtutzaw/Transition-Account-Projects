@@ -15,5 +15,9 @@ class OutStock extends Model
     {
         return $this->belongsTo(Item::class, 'item_id');
     }
-    
+
+    public function stocks()
+    {
+        return $this->belongsTo(Stock::class, 'stock_id');
+    }
 }

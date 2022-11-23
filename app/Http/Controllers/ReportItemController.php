@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ReportItemResource;
 use App\Models\Item;
+use App\Models\Stock;
 use Illuminate\Http\Request;
 
 class ReportItemController extends Controller
@@ -14,8 +16,13 @@ class ReportItemController extends Controller
      */
     public function index()
     {
-        $item = Item::with('stocks')->get();
-        return $item;
+        $stock = Stock::with('out_stocks')->get();
+        $data = ReportItemResource::collection($stock);
+        $perPage = request()->input('limit', 10);
+        $currentPage = request()->input('page', 1);
+        $total = ceil(count($stock) / $perPage);
+        $currentPageItems = $data->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+        return response()->json(["status" => "success", "data" => $currentPageItems, "total" => count($stock), 'current_page' => $currentPage, 'items_per_page' => $perPage, 'total_pages' => $total]);
     }
 
     /**
@@ -36,7 +43,8 @@ class ReportItemController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // $ldate = date('Y-m-d H:i:s');
+        // return $ldate;
     }
 
     /**

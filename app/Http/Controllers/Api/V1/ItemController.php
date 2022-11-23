@@ -24,7 +24,7 @@ class ItemController extends Controller
      */
     public function index()
     {
-        
+
         $user = Auth::user();
         $items = $user->items->sortByDesc('created_at');
         $data = ItemResource::collection($items);
@@ -56,19 +56,12 @@ class ItemController extends Controller
     {
         try {
             $user = Auth::user();
-
             $category_id = trim($request->get(self::CATEGORY_ID));
             $name = trim($request->get(self::NAME));
-            // $quantity = trim($request->get(self::QUANTITY));
-            // $acceptor = trim($request->get(self::ACCEPTOR));
-
             $item = new Item();
             $item->category_id = $category_id;
             $item->name = $name;
-            // $item->quantity = $quantity;
-            // $item->acceptor = $acceptor;
             $item->user_id = $user->id;
-
             $item->save();
             $data = new ItemResource($item);
             return success('Success', $data);

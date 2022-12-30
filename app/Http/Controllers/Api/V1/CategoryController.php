@@ -27,21 +27,39 @@ class CategoryController extends Controller
         $total = ceil(count($categories) / $perPage);
         $currentPageItems = $data->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
 
-        return response()->json(["status" => "success", "data" => $currentPageItems, "total" => count($categories), 'current_page' => $currentPage, 'items_per_page' => $perPage, 'total_pages' => $total]);
+        //for keyword
+        $keyword = strtolower(request()->input('keyword'));
+        if ($keyword) {
+            $project = Category::query()->where('name', 'Like', '%' . $keyword . '%')->get();
+            $data_keyword = CategoryResource::collection($project);
+
+            $perPage = request()->input('limit', 10);
+            $currentPage = request()->input('page', 1);
+            $total = ceil(count($project) / $perPage);
+            $currentPageItems = $data_keyword->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+            return response()->json([
+                "status" => "success", "data" => $currentPageItems,
+                "total" => count($project), 'current_page' => $currentPage,
+                'items_per_page' => $perPage, 'total_pages' => $total
+            ]);
+        }
+
+        return response()->json([
+            "status" => "success", "data" => $currentPageItems,
+            "total" => count($categories), 'current_page' => $currentPage,
+            'items_per_page' => $perPage, 'total_pages' => $total
+        ]);
+
         // return response()->json(["status" => "success", "data" => CategoryResource::collection($categories), "total" => count($categories)]);
     }
 
-// get all category notnpaginate
+    // get all category notnpaginate
     public function all_index()
     {
         $user = Auth::user();
         $categories = $user->categories->sortByDesc('created_at');
         $data = CategoryResource::collection($categories);
-        // $perPage = request()->input('limit', 10);
-        // $currentPage = request()->input('page', 1);
-        // $total = ceil(count($categories) / $perPage);
-        // $currentPageItems = $data->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
-
         return response()->json([
             "status" => "success",
             "data" => $data,

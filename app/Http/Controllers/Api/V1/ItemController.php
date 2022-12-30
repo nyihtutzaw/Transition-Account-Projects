@@ -22,9 +22,9 @@ class ItemController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index()
     {
-
         $user = Auth::user();
         $items = $user->items->sortByDesc('created_at');
         $data = ItemResource::collection($items);
@@ -33,7 +33,9 @@ class ItemController extends Controller
         $total = ceil(count($items) / $perPage);
         $currentPageItems = $data->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
 
-        return response()->json(["status" => "success", "data" => $currentPageItems, "total" => count($items), 'current_page' => $currentPage, 'items_per_page' => $perPage, 'total_pages' => $total]);
+        return response()->json(["status" => "success", "data" => $currentPageItems, 
+        "total" => count($items), 'current_page' => $currentPage,
+         'items_per_page' => $perPage, 'total_pages' => $total]);
     }
 
 

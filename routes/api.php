@@ -32,28 +32,31 @@ Route::namespace('Api\V1')->group(function () {
 
         Route::post('register', [AuthController::class, 'register']);
         Route::post('login', [AuthController::class, 'login']);
-
+        
         Route::middleware('auth:api')->group(function () {
+            Route::get('get-user', [AuthController::class, 'getUser']);
             Route::post('logout', [AuthController::class, 'logout']);
-
+            
             // Categories Routing
             Route::get('category', [CategoryController::class, 'index']);
+            Route::get('all-categories', [CategoryController::class, 'all_index']);
             Route::post('category', [CategoryController::class, 'store']);
             Route::get('category/{category}', [CategoryController::class, 'show']);
             Route::put('category/{category}', [CategoryController::class, 'update']);
             Route::delete('category/{category}', [CategoryController::class, 'destroy']);
 
             // Items Routing
-            Route::post('item', [ItemController::class, 'store']);
             Route::get('item', [ItemController::class, 'index']);
+            Route::get('all-items', [ItemController::class, 'all_index']);
+            Route::post('item', [ItemController::class, 'store']);
             Route::get('item/{item}', [ItemController::class, 'show']);
             Route::put('item/{item}', [ItemController::class, 'update']);
             Route::delete('item/{item}', [ItemController::class, 'destroy']);
             // Route::put('item-quantity/{item}', [ItemController::class, 'updateQuantity']);
 
             // InStock Routing
-            Route::post('stock', [StockController::class, 'store']);
             Route::get('stock', [StockController::class, 'index']);
+            Route::post('stock', [StockController::class, 'store']);
             Route::get('stock/{stock}', [StockController::class, 'show']);
             Route::put('stock/{stock}', [StockController::class, 'update']);
             Route::delete('stock/{stock}', [StockController::class, 'destroy']);

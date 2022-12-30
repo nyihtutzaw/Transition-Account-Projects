@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 class OutStockController extends Controller
 {
-    const CATEGORY_ID = 'category_id';
+    // const CATEGORY_ID = 'category_id';
+    const SENDER = 'sender';
     const QUANTITY = 'quantity';
     const ACCEPTOR = 'acceptor';
     const ITEM_ID   = 'item_id';
@@ -55,29 +56,28 @@ class OutStockController extends Controller
      */
     public function store(Request $request)
     {
-
         DB::beginTransaction();
         $user = Auth::user();
-        $category_id = trim($request->get(self::CATEGORY_ID));
+        $sender = trim($request->get(self::SENDER));
         $quantity = trim($request->get(self::QUANTITY));
         $acceptor = trim($request->get(self::ACCEPTOR));
-        $item_id = trim($request->get(self::ITEM_ID));
+        // $item_id = trim($request->get(self::ITEM_ID));
         $stock_id = trim($request->get(self::STOCK_ID));
 
         try {
-            $stock = OutStock::where('item_id', '=',  $item_id)->first();
+            $stock = OutStock::where('stock_id', '=',  $stock_id)->first();
+
             if ($stock === null) {
                 $stock = new OutStock();
-                $stock->category_id = $category_id;
-
-                $stock->item_id = $item_id;
+                $stock->sender = $sender;
+                // $stock->item_id = $item_id;
                 $stock->stock_id = $stock_id;
-                $stock->quantity += $quantity;
+                $stock->quantity = $quantity;
                 $stock->acceptor = $acceptor;
                 $stock->user_id = $user->id;
                 $stock->save();
 
-                $old_stock = Stock::where('item_id', '=', $item_id)->first();
+                $old_stock = Stock::where('id', '=', $stock_id)->first();
                 $old_stock->quantity -= $quantity;
                 $old_stock->save();
 
@@ -86,15 +86,14 @@ class OutStockController extends Controller
 
                 return success('Successfully Created', $data);
             } else {
-                $stock->category_id = $category_id;
-                $stock->item_id = $item_id;
+                $stock->sender = $sender;
                 $stock->stock_id = $stock_id;
                 $stock->quantity += $quantity;
                 $stock->acceptor = $acceptor;
                 $stock->user_id = $user->id;
                 $stock->save();
 
-                $old_stock = Stock::where('item_id', '=', $item_id)->first();
+                $old_stock = Stock::where('id', '=', $stock_id)->first();
                 $old_stock->quantity -= $quantity;
                 $old_stock->save();
 
@@ -142,14 +141,17 @@ class OutStockController extends Controller
     public function update(Request $request, $id)
     {
         $user = Auth::user();
-        $category_id = trim($request->get(self::CATEGORY_ID));
+        // $category_id = trim($request->get(self::CATEGORY_ID));
+        $sender = trim($request->get(self::SENDER));
+
         $quantity = trim($request->get(self::QUANTITY));
         $acceptor = trim($request->get(self::ACCEPTOR));
         $item_id = trim($request->get(self::ITEM_ID));
 
         try {
             $stock = OutStock::findOrfail($id);
-            $stock->category_id = $category_id;
+            // $stock->category_id = $category_id;
+            $stock->sender = $sender;
             $stock->item_id = $item_id;
             $stock->quantity = $quantity;
             $stock->acceptor = $acceptor;

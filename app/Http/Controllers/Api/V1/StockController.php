@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\DB;
 
 class StockController extends Controller
 {
-    const CATEGORY_ID = 'category_id';
+    // const CATEGORY_ID = 'category_id';
+    const SENDER = 'sender';
     const QUANTITY = 'quantity';
     const ACCEPTOR = 'acceptor';
     const ITEM_ID   = 'item_id';
@@ -56,7 +57,8 @@ class StockController extends Controller
     {
         DB::beginTransaction();
         $user = Auth::user();
-        $category_id = trim($request->get(self::CATEGORY_ID));
+        // $category_id = trim($request->get(self::CATEGORY_ID));
+        $sender = trim($request->get(self::SENDER));
         $quantity = trim($request->get(self::QUANTITY));
         $acceptor = trim($request->get(self::ACCEPTOR));
         $item_id = trim($request->get(self::ITEM_ID));
@@ -65,7 +67,8 @@ class StockController extends Controller
             $stock = Stock::where('item_id', '=',  $item_id)->first();
             if ($stock === null) {
                 $stock = new Stock();
-                $stock->category_id = $category_id;
+                // $stock->category_id = $category_id;
+                $stock->sender = $sender;
                 $stock->item_id = $item_id;
                 $stock->quantity = $quantity;
                 $stock->acceptor = $acceptor;
@@ -76,8 +79,8 @@ class StockController extends Controller
                 DB::commit();
                 return success('Successfully Created', $data);
             } else {
-
-                $stock->category_id = $category_id;
+                // $stock->category_id = $category_id;
+                $stock->sender = $sender;
                 $stock->item_id = $item_id;
                 $stock->quantity += $quantity;
                 $stock->acceptor = $acceptor;
@@ -127,15 +130,17 @@ class StockController extends Controller
     public function update(Request $request, $id)
     {
         $user = Auth::user();
-        $category_id = trim($request->get(self::CATEGORY_ID));
+        // $category_id = trim($request->get(self::CATEGORY_ID));
+        $sender = trim($request->get(self::SENDER));
         $quantity = trim($request->get(self::QUANTITY));
         $acceptor = trim($request->get(self::ACCEPTOR));
         $item_id = trim($request->get(self::ITEM_ID));
 
         try {
             $stock = Stock::findOrfail($id);
-            $stock->category_id = $category_id;
+            // $stock->category_id = $category_id;
             $stock->item_id = $item_id;
+            $stock->sender = $sender;
             $stock->quantity = $quantity;
             $stock->acceptor = $acceptor;
             $stock->user_id = $user->id;

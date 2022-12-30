@@ -9,7 +9,7 @@ class Stock extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['item_id', 'category_id', 'user_id', 'acceptor', 'quantity'];
+    protected $fillable = ['item_id', 'category_id', 'user_id', 'acceptor', 'quantity', 'sender'];
 
     public function items()
     {
@@ -19,5 +19,10 @@ class Stock extends Model
     public function out_stocks()
     {
         return $this->hasMany(OutStock::class, 'stock_id');
+    }
+
+    public function damageItems()
+    {
+        return $this->hasMany(DamageItem::class, 'stock_id');
     }
 }

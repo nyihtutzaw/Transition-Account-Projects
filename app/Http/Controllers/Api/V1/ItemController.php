@@ -36,6 +36,20 @@ class ItemController extends Controller
         return response()->json(["status" => "success", "data" => $currentPageItems, "total" => count($items), 'current_page' => $currentPage, 'items_per_page' => $perPage, 'total_pages' => $total]);
     }
 
+
+    //get all item not paginate
+    public function all_index()
+    {
+        $user = Auth::user();
+        $items = $user->items->sortByDesc('created_at');
+        $data = ItemResource::collection($items);
+        return response()->json([
+            "status" => "success",
+            "data" => $data,
+            "total" => count($items),
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      *

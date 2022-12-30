@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
+
     public function register(Request $request)
     {
         // return $request->all();
@@ -34,10 +35,8 @@ class AuthController extends Controller
         return success('Successfully Registered.', null);
     }
 
-
     public function login(Request $request)
     {
-
         $request->validate(
             [
                 // 'phone' => ['required', 'string'],
@@ -50,10 +49,22 @@ class AuthController extends Controller
             $user = auth()->user();
             $token = $user->createToken('Transitions')->accessToken;
             return success('Successfuly logined.', ['token' => $token]);
+        }else{
+            return "error";
         }
 
         return fail('These credentials do not match our records.', '');
     }
+
+    public function getUser(Request $request)
+    {
+        if (Auth::check()) {
+            $user = Auth::user();
+            return $user;
+        }
+        return "error";
+    }
+
 
     public function logout()
     {

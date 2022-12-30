@@ -17,6 +17,10 @@ class CreateStocksTable extends Migration
             $table->id();
             $table->bigInteger('category_id')->unsigned();
             $table->bigInteger('item_id')->unsigned();
+            $table->bigInteger('user_id')->unsigned();
+            $table->foreign('user_id')
+                ->references('id')->on('users')
+                ->onDelete('cascade');
             $table->foreign('category_id')
                 ->references('id')->on('categories')
                 ->onDelete('cascade');
@@ -24,6 +28,7 @@ class CreateStocksTable extends Migration
                 ->references('id')->on('items')
                 ->onDelete('cascade');
             $table->string('acceptor');
+            $table->string('sender');
             $table->string('quantity');
             $table->timestamps();
         });

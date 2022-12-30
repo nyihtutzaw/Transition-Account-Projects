@@ -18,6 +18,7 @@ class ItemResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'category' => $this->category ? $this->category->name : "",
+            'category_id' => $this->category ? $this->category->id : "",
             'created_at' => $this->created_at,
         ];
     }

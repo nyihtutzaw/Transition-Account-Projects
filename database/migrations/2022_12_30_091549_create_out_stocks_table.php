@@ -15,8 +15,12 @@ class CreateOutStocksTable extends Migration
     {
         Schema::create('out_stocks', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('category_id')->unsigned();
-            $table->bigInteger('item_id')->unsigned();
+            $table->bigInteger('category_id')->unsigned()->nullable();
+            $table->bigInteger('item_id')->unsigned()->nullable();
+            $table->bigInteger('stock_id')->unsigned();
+            $table->foreign('stock_id')
+                ->references('id')->on('stocks')
+                ->onDelete('cascade');
             $table->foreign('category_id')
                 ->references('id')->on('categories')
                 ->onDelete('cascade');
@@ -24,6 +28,7 @@ class CreateOutStocksTable extends Migration
                 ->references('id')->on('items')
                 ->onDelete('cascade');
             $table->string('acceptor');
+            $table->string('sender');
             $table->string('quantity');
             $table->bigInteger('user_id')->unsigned();
             $table->foreign('user_id')

@@ -15,9 +15,17 @@ class CreateDamageItemsTable extends Migration
     {
         Schema::create('damage_items', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('item_id')->unsigned();
-            $table->foreign('item_id')
-                ->references('id')->on('items')
+            // $table->bigInteger('item_id')->unsigned();
+            // $table->foreign('item_id')
+            //     ->references('id')->on('items')
+            // ->onDelete('cascade');
+            $table->bigInteger('stock_id')->unsigned();
+            $table->foreign('stock_id')
+                ->references('id')->on('stocks')
+                ->onDelete('cascade');
+            $table->bigInteger('user_id')->unsigned();
+            $table->foreign('user_id')
+                ->references('id')->on('users')
                 ->onDelete('cascade');
             $table->string('quantity');
             $table->string('acceptor');

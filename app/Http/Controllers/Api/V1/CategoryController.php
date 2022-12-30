@@ -31,6 +31,27 @@ class CategoryController extends Controller
         // return response()->json(["status" => "success", "data" => CategoryResource::collection($categories), "total" => count($categories)]);
     }
 
+// get all category notnpaginate
+    public function all_index()
+    {
+        $user = Auth::user();
+        $categories = $user->categories->sortByDesc('created_at');
+        $data = CategoryResource::collection($categories);
+        // $perPage = request()->input('limit', 10);
+        // $currentPage = request()->input('page', 1);
+        // $total = ceil(count($categories) / $perPage);
+        // $currentPageItems = $data->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+        return response()->json([
+            "status" => "success",
+            "data" => $data,
+            "total" => count($categories),
+        ]);
+        // return response()->json(["status" => "success", "data" => CategoryResource::collection($categories), "total" => count($categories)]);
+    }
+
+
+
     /**
      * Show the form for creating a new resource.
      *

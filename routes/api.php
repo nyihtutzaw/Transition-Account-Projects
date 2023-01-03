@@ -56,21 +56,22 @@ Route::namespace('Api\V1')->group(function () {
 
             // InStock Routing
             Route::get('stock', [StockController::class, 'index']);
+            Route::get('all-stocks', [StockController::class, 'all_index']);
             Route::post('stock', [StockController::class, 'store']);
             Route::get('stock/{stock}', [StockController::class, 'show']);
             Route::put('stock/{stock}', [StockController::class, 'update']);
             Route::delete('stock/{stock}', [StockController::class, 'destroy']);
 
             // OutStock Routing
-            Route::post('out-stock', [OutStockController::class, 'store']);
             Route::get('out-stock', [OutStockController::class, 'index']);
+            Route::post('out-stock', [OutStockController::class, 'store']);
             Route::get('out-stock/{stock}', [OutStockController::class, 'show']);
             Route::put('out-stock/{stock}', [OutStockController::class, 'update']);
             Route::delete('out-stock/{stock}', [OutStockController::class, 'destroy']);
 
             // DamageItems Routing
-            Route::post('damage-item', [DamageItemController::class, 'store']);
             Route::get('damage-item', [DamageItemController::class, 'index']);
+            Route::post('damage-item', [DamageItemController::class, 'store']);
             Route::get('damage-item/{stock}', [DamageItemController::class, 'show']);
             Route::put('damage-item/{stock}', [DamageItemController::class, 'update']);
             Route::delete('damage-item/{stock}', [DamageItemController::class, 'destroy']);

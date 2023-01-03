@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 class DamageItemController extends Controller
 {
     const QUANTITY = 'quantity';
-    const ACCEPTOR = 'acceptor';
+    // const ACCEPTOR = 'acceptor';
     // const ITEM_ID   = 'item_id';
     const STOCK_ID   = 'stock_id';
 
@@ -60,7 +60,7 @@ class DamageItemController extends Controller
 
         $user = Auth::user();
         $quantity = trim($request->get(self::QUANTITY));
-        $acceptor = trim($request->get(self::ACCEPTOR));
+        // $acceptor = trim($request->get(self::ACCEPTOR));
         // $item_id = trim($request->get(self::ITEM_ID));
         $stock_id = trim($request->get(self::STOCK_ID));
 
@@ -70,7 +70,7 @@ class DamageItemController extends Controller
                 $stock = new DamageItem();
                 $stock->stock_id = $stock_id;
                 $stock->quantity = $quantity;
-                $stock->acceptor = $acceptor;
+                // $stock->acceptor = $acceptor;
                 $stock->user_id = $user->id;
                 $stock->save();
 
@@ -86,7 +86,7 @@ class DamageItemController extends Controller
 
                 $stock->stock_id = $stock_id;
                 $stock->quantity += $quantity;
-                $stock->acceptor = $acceptor;
+                // $stock->acceptor = $acceptor;
                 $stock->user_id = $user->id;
                 $stock->save();
 
@@ -141,7 +141,7 @@ class DamageItemController extends Controller
 
         $user = Auth::user();
         $quantity = trim($request->get(self::QUANTITY));
-        $acceptor = trim($request->get(self::ACCEPTOR));
+        // $acceptor = trim($request->get(self::ACCEPTOR));
         // $item_id = trim($request->get(self::ITEM_ID));
         $stock_id = trim($request->get(self::STOCK_ID));
 
@@ -150,7 +150,7 @@ class DamageItemController extends Controller
             $item_new->stock_id = $stock_id;
 
             $item_new->quantity = $quantity;
-            $item_new->acceptor = $acceptor;
+            // $item_new->acceptor = $acceptor;
             $item_new->user_id = $user->id;
             $item_new->save();
             $data = new DamageItemResource($item_new);

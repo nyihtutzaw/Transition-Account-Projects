@@ -115,7 +115,7 @@ class OutStockController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(OutStock $stock)
-    {
+    {        
         $data = new OutStockResource($stock);
         return success('Success', $data);
     }
@@ -143,16 +143,18 @@ class OutStockController extends Controller
         $user = Auth::user();
         // $category_id = trim($request->get(self::CATEGORY_ID));
         $sender = trim($request->get(self::SENDER));
-
         $quantity = trim($request->get(self::QUANTITY));
         $acceptor = trim($request->get(self::ACCEPTOR));
-        $item_id = trim($request->get(self::ITEM_ID));
+        // $item_id = trim($request->get(self::ITEM_ID));
+        $stock_id = trim($request->get(self::STOCK_ID));
+
 
         try {
             $stock = OutStock::findOrfail($id);
             // $stock->category_id = $category_id;
             $stock->sender = $sender;
-            $stock->item_id = $item_id;
+            // $stock->item_id = $item_id;
+            $stock->stock_id = $stock_id;
             $stock->quantity = $quantity;
             $stock->acceptor = $acceptor;
             $stock->user_id = $user->id;

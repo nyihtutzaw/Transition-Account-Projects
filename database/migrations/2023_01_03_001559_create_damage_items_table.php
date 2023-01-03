@@ -28,7 +28,7 @@ class CreateDamageItemsTable extends Migration
                 ->references('id')->on('users')
                 ->onDelete('cascade');
             $table->string('quantity');
-            $table->string('acceptor');
+            // $table->string('acceptor');
             $table->timestamps();
         });
     }

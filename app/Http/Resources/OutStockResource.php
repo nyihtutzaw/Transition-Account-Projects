@@ -18,8 +18,11 @@ class OutStockResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'name' => $this->items ? $this->items->name : "null",
-            'acceptory' => $this->acceptor,
+            'name' => $this->stocks ? $this->stocks->items->name : "null",
+            'acceptor' => $this->acceptor,
+            'stock_id' => $this->stock_id,
+            // 'stock_id' => $this->stocks ? $this->stocks->items->id : "null",
+            'sender' => $this->sender,
             'quantity' => $this->quantity,
             'created_at' => $this->created_at,
         ];

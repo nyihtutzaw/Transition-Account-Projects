@@ -37,6 +37,19 @@ class StockController extends Controller
         return response()->json(["status" => "success", "data" => $currentPageItems, "total" => count($stocks), 'current_page' => $currentPage, 'items_per_page' => $perPage, 'total_pages' => $total]);
     }
 
+     //get all item not paginate
+     public function all_index()
+     {
+         $user = Auth::user();
+         $stocks = $user->stocks->sortByDesc('created_at');
+         $data = StockResource::collection($stocks);
+         return response()->json([
+             "status" => "success",
+             "data" => $data,
+             "total" => count($stocks),
+         ]);
+     }
+
     /**
      * Show the form for creating a new resource.
      *

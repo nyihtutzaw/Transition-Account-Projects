@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\DamageItemController;
 use App\Http\Controllers\Api\V1\ItemController;
 use App\Http\Controllers\Api\V1\StockController;
 use App\Http\Controllers\Api\V1\OutStockController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportItemController;
 
 /*
@@ -77,6 +78,7 @@ Route::namespace('Api\V1')->group(function () {
             Route::delete('damage-item/{stock}', [DamageItemController::class, 'destroy']);
 
             //Report Item
+            Route::get('report', [ReportController::class, 'getReport']);
             Route::get('item-report', [ReportItemController::class, 'index']);
             Route::get('item-report-date', [ReportItemController::class, 'store']);
         });

@@ -61,16 +61,12 @@ class OutStockController extends Controller
         $sender = trim($request->get(self::SENDER));
         $quantity = trim($request->get(self::QUANTITY));
         $acceptor = trim($request->get(self::ACCEPTOR));
-        // $item_id = trim($request->get(self::ITEM_ID));
         $stock_id = trim($request->get(self::STOCK_ID));
-
         try {
             $stock = OutStock::where('stock_id', '=',  $stock_id)->first();
-
             if ($stock === null) {
                 $stock = new OutStock();
                 $stock->sender = $sender;
-                // $stock->item_id = $item_id;
                 $stock->stock_id = $stock_id;
                 $stock->quantity = $quantity;
                 $stock->acceptor = $acceptor;
@@ -78,6 +74,9 @@ class OutStockController extends Controller
                 $stock->save();
 
                 $old_stock = Stock::where('id', '=', $stock_id)->first();
+                if ($old_stock->quantity < $quantity) {
+                    return fail("Your Quantity is greater than..!", null);
+                }
                 $old_stock->quantity -= $quantity;
                 $old_stock->save();
 
@@ -94,6 +93,10 @@ class OutStockController extends Controller
                 $stock->save();
 
                 $old_stock = Stock::where('id', '=', $stock_id)->first();
+                if ($old_stock->quantity < $quantity) {
+                    return fail("Your Quantity is greater than..!", null);
+                }
+
                 $old_stock->quantity -= $quantity;
                 $old_stock->save();
 
@@ -115,7 +118,7 @@ class OutStockController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(OutStock $stock)
-    {        
+    {
         $data = new OutStockResource($stock);
         return success('Success', $data);
     }

@@ -55,9 +55,7 @@ class DamageItemController extends Controller
      */
     public function store(Request $request)
     {
-
         DB::beginTransaction();
-
         $user = Auth::user();
         $quantity = trim($request->get(self::QUANTITY));
         // $acceptor = trim($request->get(self::ACCEPTOR));
@@ -146,19 +144,55 @@ class DamageItemController extends Controller
         $stock_id = trim($request->get(self::STOCK_ID));
 
         try {
-            $item_new = DamageItem::findOrFail($id);
-            $item_new->stock_id = $stock_id;
+            $stock = DamageItem::where('stock_id', '=',  $stock_id)->first();
+            if ($stock === null) {
+                $stock = new DamageItem();
+                $stock->stock_id = $stock_id;
+                $stock->quantity = $quantity;
+                $stock->user_id = $user->id;
+                $stock->save();
 
-            $item_new->quantity = $quantity;
-            // $item_new->acceptor = $acceptor;
-            $item_new->user_id = $user->id;
-            $item_new->save();
-            $data = new DamageItemResource($item_new);
+                $old_stock = Stock::where('id', '=', $stock_id)->first();
+                $old_stock->quantity -= $quantity;
+                $old_stock->save();
 
-            return success('Success Updated', $data);
+                $data = new DamageItemResource($stock);
+                DB::commit();
+
+                return success('Successfully Created', $data);
+            } else {
+
+                $stock->stock_id = $stock_id;
+                $stock->quantity += $quantity;
+                $stock->user_id = $user->id;
+                $stock->save();
+
+                $old_stock = Stock::where('id', '=', $stock_id)->first();
+                $old_stock->quantity -= $quantity;
+                $old_stock->save();
+
+                $data = new DamageItemResource($stock);
+                DB::commit();
+
+                return success('Successfull Updated', $data);
+            }
         } catch (Exception $ex) {
+            DB::rollBack();
             return fail("Please try again!", null);
         }
+
+        // try {
+        //     $item_new = DamageItem::findOrFail($id);
+        //     $item_new->stock_id = $stock_id;
+        //     $item_new->quantity = $quantity;
+        //     $item_new->user_id = $user->id;
+        //     $item_new->save();
+        //     $data = new DamageItemResource($item_new);
+
+        //     return success('Success Updated', $data);
+        // } catch (Exception $ex) {
+        //     return fail("Please try again!", null);
+        // }
     }
 
     /**

@@ -48,7 +48,8 @@ class CategoryController extends Controller
         return response()->json([
             "status" => "success", "data" => $currentPageItems,
             "total" => count($categories), 'current_page' => $currentPage,
-            'items_per_page' => $perPage, 'total_pages' => $total
+            'items_per_page' => $perPage, 'total_pages' => $total,
+            // 'from' => 
         ]);
 
         // return response()->json(["status" => "success", "data" => CategoryResource::collection($categories), "total" => count($categories)]);

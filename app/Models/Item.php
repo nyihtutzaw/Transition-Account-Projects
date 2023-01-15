@@ -17,9 +17,14 @@ class Item extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
+    // public function stocks()
+    // {
+    //     return $this->hasMany(Stock::class, 'item_id');
+    // }
+
     public function stocks()
     {
-        return $this->hasMany(Stock::class, 'item_id');
+        return $this->hasOne(Stock::class, 'item_id');
     }
 
     public function outStocks()

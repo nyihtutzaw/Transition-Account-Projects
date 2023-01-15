@@ -35,6 +35,28 @@ class OutStockController extends Controller
         $total = ceil(count($out_stocks) / $perPage);
         $currentPageItems = $data->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
 
+        //for keyword
+        $keyword = strtolower(request()->input('keyword'));
+        if ($keyword) {
+            $users = DB::table('items')
+                ->Join('stocks', 'items.id', '=', 'stocks.item_id')
+                ->Join('out_stocks', 'stocks.id', '=', 'out_stocks.stock_id')
+                ->where('name', 'Like', '%' . $keyword . '%')
+                ->get();
+
+            $perPage = request()->input('limit', 10);
+            $currentPage = request()->input('page', 1);
+            $total = ceil(count($users) / $perPage);
+            $currentPageItems = $users->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+            return response()->json([
+                "status" => "success", "data" => $currentPageItems,
+                "total" => count($users), 'current_page' => $currentPage,
+                'items_per_page' => $perPage, 'total_pages' => $total
+            ]);
+        }
+
+
         return response()->json(["status" => "success", "data" => $currentPageItems, "total" => count($out_stocks), 'current_page' => $currentPage, 'items_per_page' => $perPage, 'total_pages' => $total]);
     }
 
@@ -144,25 +166,28 @@ class OutStockController extends Controller
     public function update(Request $request, $id)
     {
         $user = Auth::user();
-        // $category_id = trim($request->get(self::CATEGORY_ID));
         $sender = trim($request->get(self::SENDER));
         $quantity = trim($request->get(self::QUANTITY));
         $acceptor = trim($request->get(self::ACCEPTOR));
-        // $item_id = trim($request->get(self::ITEM_ID));
         $stock_id = trim($request->get(self::STOCK_ID));
-
 
         try {
             $stock = OutStock::findOrfail($id);
-            // $stock->category_id = $category_id;
             $stock->sender = $sender;
-            // $stock->item_id = $item_id;
             $stock->stock_id = $stock_id;
             $stock->quantity = $quantity;
             $stock->acceptor = $acceptor;
             $stock->user_id = $user->id;
-
             $stock->save();
+
+            $old_stock = Stock::where('id', '=', $stock_id)->first();
+            if ($old_stock->quantity < $quantity) {
+                return fail("Your Quantity is greater than..!", null);
+            }
+
+            $old_stock->quantity -= $quantity;
+            $old_stock->save();
+
             $data = new OutStockResource($stock);
             return success('Success', $data);
         } catch (Exception $ex) {

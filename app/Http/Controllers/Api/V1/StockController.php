@@ -34,21 +34,41 @@ class StockController extends Controller
         $total = ceil(count($stocks) / $perPage);
         $currentPageItems = $data->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
 
+        //for keyword
+        $keyword = strtolower(request()->input('keyword'));
+        if ($keyword) {
+            $users = DB::table('items')
+                ->Join('stocks', 'items.id', '=', 'stocks.item_id')
+                ->where('name', 'Like', '%' . $keyword . '%')
+                ->get();
+
+            $perPage = request()->input('limit', 10);
+            $currentPage = request()->input('page', 1);
+            $total = ceil(count($users) / $perPage);
+            $currentPageItems = $users->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+            return response()->json([
+                "status" => "success", "data" => $currentPageItems,
+                "total" => count($users), 'current_page' => $currentPage,
+                'items_per_page' => $perPage, 'total_pages' => $total
+            ]);
+        }
+
         return response()->json(["status" => "success", "data" => $currentPageItems, "total" => count($stocks), 'current_page' => $currentPage, 'items_per_page' => $perPage, 'total_pages' => $total]);
     }
 
-     //get all item not paginate
-     public function all_index()
-     {
-         $user = Auth::user();
-         $stocks = $user->stocks->sortByDesc('created_at');
-         $data = StockResource::collection($stocks);
-         return response()->json([
-             "status" => "success",
-             "data" => $data,
-             "total" => count($stocks),
-         ]);
-     }
+    //get all item not paginate
+    public function all_index()
+    {
+        $user = Auth::user();
+        $stocks = $user->stocks->sortByDesc('created_at');
+        $data = StockResource::collection($stocks);
+        return response()->json([
+            "status" => "success",
+            "data" => $data,
+            "total" => count($stocks),
+        ]);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -118,6 +138,7 @@ class StockController extends Controller
      */
     public function show(Stock $stock)
     {
+        // return $stock->items->name;
         $data = new StockResource($stock);
         return success('Success', $data);
     }
@@ -143,7 +164,6 @@ class StockController extends Controller
     public function update(Request $request, $id)
     {
         $user = Auth::user();
-        // $category_id = trim($request->get(self::CATEGORY_ID));
         $sender = trim($request->get(self::SENDER));
         $quantity = trim($request->get(self::QUANTITY));
         $acceptor = trim($request->get(self::ACCEPTOR));
@@ -151,7 +171,6 @@ class StockController extends Controller
 
         try {
             $stock = Stock::findOrfail($id);
-            // $stock->category_id = $category_id;
             $stock->item_id = $item_id;
             $stock->sender = $sender;
             $stock->quantity = $quantity;

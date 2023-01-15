@@ -69,8 +69,6 @@ class CategoryController extends Controller
         // return response()->json(["status" => "success", "data" => CategoryResource::collection($categories), "total" => count($categories)]);
     }
 
-
-
     /**
      * Show the form for creating a new resource.
      *

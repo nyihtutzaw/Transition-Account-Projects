@@ -28,7 +28,8 @@ class OutStockController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $out_stocks = $user->outStocks->sortByDesc('created_at');
+        $out_stocks = $user->outStocks->sortByDesc('created_at');        
+        
         $data = OutStockResource::collection($out_stocks);
         $perPage = request()->input('limit', 10);
         $currentPage = request()->input('page', 1);

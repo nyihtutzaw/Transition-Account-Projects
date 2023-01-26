@@ -78,9 +78,10 @@ Route::namespace('Api\V1')->group(function () {
             Route::delete('damage-item/{stock}', [DamageItemController::class, 'destroy']);
 
             //Report Item
-            Route::get('report', [ReportController::class, 'getReport']);
-            Route::get('item-report', [ReportItemController::class, 'index']);
-            Route::get('item-report-date', [ReportItemController::class, 'store']);
+            Route::get('in-stock-report', [ReportController::class, 'getInStockReport']);
+            Route::get('out-stock-report', [ReportController::class, 'getOutStockReport']);
+            Route::get('damage-report', [ReportController::class, 'getDamageReport']);
+            
         });
     });
 });

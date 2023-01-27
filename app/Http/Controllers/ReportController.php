@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\DamageItemResource;
 use App\Http\Resources\InStockReportResource;
+use App\Http\Resources\OutStockResource;
 use App\Models\DamageItem;
 use App\Models\OutStock;
 use App\Models\Stock;
@@ -13,33 +15,48 @@ class ReportController extends Controller
 {
     public function getInStockReport()
     {
-        $totalStock = new Stock();
-       
-        if (request()->start_date && request()->end_date) {
-            $totalStock = $totalStock->whereBetween('created_at', [request()->start_date . ' 00:00:00', request()->end_date . ' 23:59:59']);
-            $totalStockAll = $totalStock->sum('quantity');
 
-            return [
-                "inStock" => $totalStock,
-                "inStockTotal" => $totalStockAll,
-            ];
+        $startDate = request()->input('start_date');
+        $endDate = request()->input('end_date');
+        $totalStock = new Stock();
+
+        if (!is_null($startDate)  && !is_null($endDate)) {
             
-        } else {
-            $totalStock = $totalStock->get();
-            $totalStockAll = $totalStock->sum('quantity');
-            $totalStock = InStockReportResource::collection($totalStock);
-            
+            $Stocks = Stock::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])->get();
+            $totalStockAll = $Stocks->sum('quantity');
+
+
+            $totalStock = InStockReportResource::collection($Stocks);
             $perPage = request()->input('limit', 10);
             $currentPage = request()->input('page', 1);
             $total = ceil(count($totalStock) / $perPage);
             $currentPageItems = $totalStock->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
 
-            return response()->json(["status" => "success", 
-            "data" => $currentPageItems, "total" => count($totalStock), 
-            'current_page' => $currentPage, 'items_per_page' => $perPage,
-             'total_pages' => $total, 'totalInStockQuantity' => $totalStockAll]);
-        }
+            return response()->json([
+                "status" => "success",
+                "data" => $currentPageItems, "total" => count($totalStock),
+                'current_page' => $currentPage, 'items_per_page' => $perPage,
+                'total_pages' => $total, 'totalInStockQuantity' => $totalStockAll
+            ]);
 
+            
+        } else {
+            $totalStock = $totalStock->get();
+            $totalStockAll = $totalStock->sum('quantity');
+            $totalStock = InStockReportResource::collection($totalStock);
+
+            $perPage = request()->input('limit', 10);
+            $currentPage = request()->input('page', 1);
+            $total = ceil(count($totalStock) / $perPage);
+            $currentPageItems = $totalStock->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+            return response()->json([
+                "status" => "success",
+                "data" => $currentPageItems, "total" => count($totalStock),
+                'current_page' => $currentPage, 'items_per_page' => $perPage,
+                'total_pages' => $total, 'totalInStockQuantity' => $totalStockAll
+            ]);
+        }
     }
 
     public function getOutStockReport()
@@ -50,14 +67,21 @@ class ReportController extends Controller
             $totalStockOut = $totalStockOut->get();
             $totalStockOutAll = $totalStockOut->sum('quantity');
 
-            return [
-                "OutStock" => $totalStockOut,
-                "OutStockAll" => $totalStockOutAll,
-            ];
-            
-        } else {
-            
+            $totalStock = OutStockResource::collection($totalStockOut);
 
+            $perPage = request()->input('limit', 10);
+            $currentPage = request()->input('page', 1);
+            $total = ceil(count($totalStock) / $perPage);
+            $currentPageItems = $totalStock->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+            return response()->json([
+                "status" => "success",
+                "data" => $currentPageItems, "total" => count($totalStock),
+                'current_page' => $currentPage, 'items_per_page' => $perPage,
+                'total_pages' => $total, 'totalInStockQuantity' => $totalStockOutAll
+            ]);
+
+        } else {
             $totalStockOut = $totalStockOut->get();
             $totalStockOutAll = $totalStockOut->sum('quantity');
             $perPage = request()->input('limit', 10);
@@ -65,10 +89,12 @@ class ReportController extends Controller
             $total = ceil(count($totalStockOut) / $perPage);
             $currentPageItems = $totalStockOut->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
 
-            return response()->json(["status" => "success", 
-            "data" => $currentPageItems, "total" => count($totalStockOut), 
-            'current_page' => $currentPage, 'items_per_page' => $perPage,
-             'total_pages' => $total, 'totalOutStockQuantity' => $totalStockOutAll]);
+            return response()->json([
+                "status" => "success",
+                "data" => $currentPageItems, "total" => count($totalStockOut),
+                'current_page' => $currentPage, 'items_per_page' => $perPage,
+                'total_pages' => $total, 'totalOutStockQuantity' => $totalStockOutAll
+            ]);
         }
     }
 
@@ -80,11 +106,19 @@ class ReportController extends Controller
             $totalDamageItems = $totalDamageItems->get();
             $totalDamageItemsAll = $totalDamageItems->sum('quantity');
 
-            return [
-                "damageItems" => $totalDamageItems,
-                "damageItemsAll" => $totalDamageItemsAll,
-            ];
-            
+            $totalStock = DamageItemResource::collection($totalDamageItems);
+            $perPage = request()->input('limit', 10);
+            $currentPage = request()->input('page', 1);
+            $total = ceil(count($totalStock) / $perPage);
+            $currentPageItems = $totalStock->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+            return response()->json([
+                "status" => "success",
+                "data" => $currentPageItems, "total" => count($totalStock),
+                'current_page' => $currentPage, 'items_per_page' => $perPage,
+                'total_pages' => $total, 'totalInStockQuantity' => $totalDamageItemsAll
+            ]);
+
         } else {
 
             $totalDamageItems = $totalDamageItems->get();
@@ -95,11 +129,12 @@ class ReportController extends Controller
             $total = ceil(count($totalDamageItems) / $perPage);
             $currentPageItems = $totalDamageItems->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
 
-            return response()->json(["status" => "success", 
-            "data" => $currentPageItems, "total" => count($totalDamageItems), 
-            'current_page' => $currentPage, 'items_per_page' => $perPage,
-             'total_pages' => $total, 'totalDamageQuantity' => $totalDamageItemsAll]);
+            return response()->json([
+                "status" => "success",
+                "data" => $currentPageItems, "total" => count($totalDamageItems),
+                'current_page' => $currentPage, 'items_per_page' => $perPage,
+                'total_pages' => $total, 'totalDamageQuantity' => $totalDamageItemsAll
+            ]);
         }
     }
-
 }

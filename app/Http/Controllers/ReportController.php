@@ -8,6 +8,7 @@ use App\Http\Resources\OutStockResource;
 use App\Models\DamageItem;
 use App\Models\OutStock;
 use App\Models\Stock;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,11 +19,29 @@ class ReportController extends Controller
 
         $startDate = request()->input('start_date');
         $endDate = request()->input('end_date');
-        $totalStock = new Stock();
+
+        $keyword = strtolower(request()->input('keyword'));
+        if ($keyword) {
+            $users = DB::table('items')
+                ->Join('stocks', 'items.id', '=', 'stocks.item_id')
+                ->where('name', 'Like', '%' . $keyword . '%')
+                ->get();
+
+            $perPage = request()->input('limit', 10);
+            $currentPage = request()->input('page', 1);
+            $total = ceil(count($users) / $perPage);
+            $currentPageItems = $users->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+            return response()->json([
+                "status" => "success", "data" => $currentPageItems,
+                "total" => count($users), 'current_page' => $currentPage,
+                'items_per_page' => $perPage, 'total_pages' => $total
+            ]);
+        }
 
         if (!is_null($startDate)  && !is_null($endDate)) {
-            
-            $Stocks = Stock::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])->get();
+
+            $Stocks = Stock::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])->orderBy('created_at', 'desc')->get();
             $totalStockAll = $Stocks->sum('quantity');
 
 
@@ -38,10 +57,12 @@ class ReportController extends Controller
                 'current_page' => $currentPage, 'items_per_page' => $perPage,
                 'total_pages' => $total, 'totalInStockQuantity' => $totalStockAll
             ]);
-
-            
         } else {
-            $totalStock = $totalStock->get();
+            $totalStock = Stock::select('*')
+                ->whereMonth('created_at', Carbon::now()->month)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
             $totalStockAll = $totalStock->sum('quantity');
             $totalStock = InStockReportResource::collection($totalStock);
 
@@ -61,13 +82,54 @@ class ReportController extends Controller
 
     public function getOutStockReport()
     {
-        $totalStockOut = new OutStock();
-        if (request()->start_date && request()->end_date) {
-            $totalStockOut = $totalStockOut->whereBetween('created_at', [request()->start_date . ' 00:00:00', request()->end_date . ' 23:59:59']);
-            $totalStockOut = $totalStockOut->get();
-            $totalStockOutAll = $totalStockOut->sum('quantity');
+        $startDate = request()->input('start_date');
+        $endDate = request()->input('end_date');
 
-            $totalStock = OutStockResource::collection($totalStockOut);
+        $keyword = strtolower(request()->input('keyword'));
+        if ($keyword) {
+            $users = DB::table('items')
+                ->Join('stocks', 'items.id', '=', 'stocks.item_id')
+                ->Join('out_stocks', 'stocks.id', '=', 'out_stocks.stock_id')
+                ->where('name', 'Like', '%' . $keyword . '%')
+                ->get();
+
+            $perPage = request()->input('limit', 10);
+            $currentPage = request()->input('page', 1);
+            $total = ceil(count($users) / $perPage);
+            $currentPageItems = $users->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+            return response()->json([
+                "status" => "success", "data" => $currentPageItems,
+                "total" => count($users), 'current_page' => $currentPage,
+                'items_per_page' => $perPage, 'total_pages' => $total
+            ]);
+        }
+
+        if (!is_null($startDate)  && !is_null($endDate)) {
+
+            $Stocks = OutStock::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])->orderBy('created_at', 'desc')->get();
+            $totalStockAll = $Stocks->sum('quantity');
+
+            $totalStock = OutStockResource::collection($Stocks);            
+            $perPage = request()->input('limit', 10);
+            $currentPage = request()->input('page', 1);
+            $total = ceil(count($totalStock) / $perPage);
+            $currentPageItems = $totalStock->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+            return response()->json([
+                "status" => "success",
+                "data" => $currentPageItems, "total" => count($totalStock),
+                'current_page' => $currentPage, 'items_per_page' => $perPage,
+                'total_pages' => $total, 'totalInStockQuantity' => $totalStockAll
+            ]);
+        } else {
+            $totalStock = OutStock::select('*')
+                ->whereMonth('created_at', Carbon::now()->month)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $totalStockAll = $totalStock->sum('quantity');
+            $totalStock = OutStockResource::collection($totalStock);
 
             $perPage = request()->input('limit', 10);
             $currentPage = request()->input('page', 1);
@@ -78,35 +140,78 @@ class ReportController extends Controller
                 "status" => "success",
                 "data" => $currentPageItems, "total" => count($totalStock),
                 'current_page' => $currentPage, 'items_per_page' => $perPage,
-                'total_pages' => $total, 'totalInStockQuantity' => $totalStockOutAll
-            ]);
-
-        } else {
-            $totalStockOut = $totalStockOut->get();
-            $totalStockOutAll = $totalStockOut->sum('quantity');
-            $perPage = request()->input('limit', 10);
-            $currentPage = request()->input('page', 1);
-            $total = ceil(count($totalStockOut) / $perPage);
-            $currentPageItems = $totalStockOut->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
-
-            return response()->json([
-                "status" => "success",
-                "data" => $currentPageItems, "total" => count($totalStockOut),
-                'current_page' => $currentPage, 'items_per_page' => $perPage,
-                'total_pages' => $total, 'totalOutStockQuantity' => $totalStockOutAll
+                'total_pages' => $total, 'totalInStockQuantity' => $totalStockAll
             ]);
         }
     }
 
     public function getDamageReport()
     {
-        $totalDamageItems = new DamageItem();
-        if (request()->start_date && request()->end_date) {
-            $totalDamageItems = $totalDamageItems->whereBetween('created_at', [request()->start_date . ' 00:00:00', request()->end_date . ' 23:59:59']);
-            $totalDamageItems = $totalDamageItems->get();
-            $totalDamageItemsAll = $totalDamageItems->sum('quantity');
+        // $totalDamageItems = new DamageItem();
+        // if (request()->start_date && request()->end_date) {
+        //     $totalDamageItems = $totalDamageItems->whereBetween('created_at', [request()->start_date . ' 00:00:00', request()->end_date . ' 23:59:59']);
+        //     $totalDamageItems = $totalDamageItems->get();
+        //     $totalDamageItemsAll = $totalDamageItems->sum('quantity');
 
-            $totalStock = DamageItemResource::collection($totalDamageItems);
+        //     $totalStock = DamageItemResource::collection($totalDamageItems);
+        //     $perPage = request()->input('limit', 10);
+        //     $currentPage = request()->input('page', 1);
+        //     $total = ceil(count($totalStock) / $perPage);
+        //     $currentPageItems = $totalStock->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+        //     return response()->json([
+        //         "status" => "success",
+        //         "data" => $currentPageItems, "total" => count($totalStock),
+        //         'current_page' => $currentPage, 'items_per_page' => $perPage,
+        //         'total_pages' => $total, 'totalInStockQuantity' => $totalDamageItemsAll
+        //     ]);
+        // } else {
+
+        //     $totalDamageItems = $totalDamageItems->get();
+        //     $totalDamageItemsAll = $totalDamageItems->sum('quantity');
+
+        //     $perPage = request()->input('limit', 10);
+        //     $currentPage = request()->input('page', 1);
+        //     $total = ceil(count($totalDamageItems) / $perPage);
+        //     $currentPageItems = $totalDamageItems->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+        //     return response()->json([
+        //         "status" => "success",
+        //         "data" => $currentPageItems, "total" => count($totalDamageItems),
+        //         'current_page' => $currentPage, 'items_per_page' => $perPage,
+        //         'total_pages' => $total, 'totalDamageQuantity' => $totalDamageItemsAll
+        //     ]);
+        // }
+
+        $startDate = request()->input('start_date');
+        $endDate = request()->input('end_date');
+
+        $keyword = strtolower(request()->input('keyword'));
+        if ($keyword) {
+            $users = DB::table('items')
+                ->Join('stocks', 'items.id', '=', 'stocks.item_id')
+                ->Join('damage_items', 'stocks.id', '=', 'damage_items.stock_id')
+                ->where('name', 'Like', '%' . $keyword . '%')
+                ->get();
+
+            $perPage = request()->input('limit', 10);
+            $currentPage = request()->input('page', 1);
+            $total = ceil(count($users) / $perPage);
+            $currentPageItems = $users->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+
+            return response()->json([
+                "status" => "success", "data" => $currentPageItems,
+                "total" => count($users), 'current_page' => $currentPage,
+                'items_per_page' => $perPage, 'total_pages' => $total
+            ]);
+        }
+
+        if (!is_null($startDate)  && !is_null($endDate)) {
+
+            $Stocks = DamageItem::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])->orderBy('created_at', 'desc')->get();
+            $totalStockAll = $Stocks->sum('quantity');
+
+            $totalStock = DamageItemResource::collection($Stocks);            
             $perPage = request()->input('limit', 10);
             $currentPage = request()->input('page', 1);
             $total = ceil(count($totalStock) / $perPage);
@@ -116,24 +221,27 @@ class ReportController extends Controller
                 "status" => "success",
                 "data" => $currentPageItems, "total" => count($totalStock),
                 'current_page' => $currentPage, 'items_per_page' => $perPage,
-                'total_pages' => $total, 'totalInStockQuantity' => $totalDamageItemsAll
+                'total_pages' => $total, 'totalInStockQuantity' => $totalStockAll
             ]);
-
         } else {
+            $totalStock = DamageItem::select('*')
+                ->whereMonth('created_at', Carbon::now()->month)
+                ->orderBy('created_at', 'desc')
+                ->get();
 
-            $totalDamageItems = $totalDamageItems->get();
-            $totalDamageItemsAll = $totalDamageItems->sum('quantity');
+            $totalStockAll = $totalStock->sum('quantity');
+            $totalStock = DamageItemResource::collection($totalStock);
 
             $perPage = request()->input('limit', 10);
             $currentPage = request()->input('page', 1);
-            $total = ceil(count($totalDamageItems) / $perPage);
-            $currentPageItems = $totalDamageItems->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
+            $total = ceil(count($totalStock) / $perPage);
+            $currentPageItems = $totalStock->slice(($currentPage * $perPage) - $perPage, $perPage)->values();
 
             return response()->json([
                 "status" => "success",
-                "data" => $currentPageItems, "total" => count($totalDamageItems),
+                "data" => $currentPageItems, "total" => count($totalStock),
                 'current_page' => $currentPage, 'items_per_page' => $perPage,
-                'total_pages' => $total, 'totalDamageQuantity' => $totalDamageItemsAll
+                'total_pages' => $total, 'totalInStockQuantity' => $totalStockAll
             ]);
         }
     }

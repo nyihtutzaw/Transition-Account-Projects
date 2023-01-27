@@ -37,7 +37,6 @@ class DamageItemController extends Controller
         $keyword = strtolower(request()->input('keyword'));
         if ($keyword) {
             // return $keyword;
-
             $users = DB::table('items')
                 ->Join('stocks', 'items.id', '=', 'stocks.item_id')
                 ->Join('damage_items', 'stocks.id', '=', 'damage_items.stock_id')

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Utils\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -32,7 +33,7 @@ class AuthController extends Controller
         $user->password = Hash::make($request->password);
         $user->save();
         // $token = $user->createToken('Transitions')->accessToken;
-        return success('Successfully Registered.', null);
+        return ResponseHelper::success('Successfully Registered.', null);
     }
 
     public function login(Request $request)
@@ -48,12 +49,12 @@ class AuthController extends Controller
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = auth()->user();
             $token = $user->createToken('Transitions')->accessToken;
-            return success('Successfuly logined.', ['token' => $token]);
-        }else{
+            return ResponseHelper::success('Successfuly logined.', ['token' => $token]);
+        } else {
             return "error";
         }
 
-        return fail('These credentials do not match our records.', '');
+        return ResponseHelper::fail('These credentials do not match our records.', '');
     }
 
     public function getUser(Request $request)
@@ -71,6 +72,6 @@ class AuthController extends Controller
         $user = auth()->user();
         $user->token()->revoke();
 
-        return success('Successfully logouted.', null);
+        return ResponseHelper::success('Successfully logouted.', null);
     }
 }

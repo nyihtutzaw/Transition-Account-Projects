@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Utils\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\StockResource;
 use App\Models\Stock;
@@ -110,7 +111,7 @@ class StockController extends Controller
                 $data = new StockResource($stock);
 
                 DB::commit();
-                return success('Successfully Created', $data);
+                return ResponseHelper::success('Successfully Created', $data);
             } else {
                 // $stock->category_id = $category_id;
                 $stock->sender = $sender;
@@ -122,11 +123,11 @@ class StockController extends Controller
                 $data = new StockResource($stock);
 
                 DB::commit();
-                return success('Successfully Updated', $data);
+                return ResponseHelper::success('Successfully Updated', $data);
             }
         } catch (Exception $ex) {
             DB::rollBack();
-            return fail("Please try again!", null);
+            return ResponseHelper::fail("Please try again!", null);
         }
     }
 
@@ -140,7 +141,7 @@ class StockController extends Controller
     {
         // return $stock->items->name;
         $data = new StockResource($stock);
-        return success('Success', $data);
+        return ResponseHelper::success('Success', $data);
     }
 
     /**
@@ -179,9 +180,9 @@ class StockController extends Controller
 
             $stock->save();
             $data = new StockResource($stock);
-            return success('Success', $data);
+            return ResponseHelper::success('Success', $data);
         } catch (Exception $ex) {
-            return fail("Please try again!", null);
+            return ResponseHelper::fail("Please try again!", null);
         }
     }
 
@@ -196,9 +197,9 @@ class StockController extends Controller
         try {
             $item = Stock::findOrFail($id);
             $item->delete();
-            return success('Success deleted', null);
+            return ResponseHelper::success('Success deleted', null);
         } catch (Exception $ex) {
-            return fail('Please try again!', null);
+            return ResponseHelper::fail('Please try again!', null);
         }
     }
 }

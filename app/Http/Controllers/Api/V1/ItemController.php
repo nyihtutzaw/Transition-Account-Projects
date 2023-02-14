@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Utils\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ItemResource;
 use App\Models\Item;
@@ -51,9 +52,11 @@ class ItemController extends Controller
             ]);
         }
 
-        return response()->json(["status" => "success", "data" => $currentPageItems, 
-        "total" => count($items), 'current_page' => $currentPage,
-         'items_per_page' => $perPage, 'total_pages' => $total]);
+        return response()->json([
+            "status" => "success", "data" => $currentPageItems,
+            "total" => count($items), 'current_page' => $currentPage,
+            'items_per_page' => $perPage, 'total_pages' => $total
+        ]);
     }
 
 
@@ -98,9 +101,9 @@ class ItemController extends Controller
             $item->user_id = $user->id;
             $item->save();
             $data = new ItemResource($item);
-            return success('Success', $data);
+            return ResponseHelper::success('Success', $data);
         } catch (Exception $ex) {
-            return fail("Please try again!", null);
+            return ResponseHelper::fail("Please try again!", null);
         }
     }
 
@@ -113,7 +116,7 @@ class ItemController extends Controller
     public function show(Item $item)
     {
         $data = new ItemResource($item);
-        return success('Success', $data);
+        return ResponseHelper::success('Success', $data);
     }
 
     /**
@@ -148,10 +151,10 @@ class ItemController extends Controller
             $item_new->save();
             $data = new ItemResource($item_new);
 
-            return success('Success Created', $data);
+            return ResponseHelper::success('Success Created', $data);
         } catch (Exception $ex) {
             DB::rollBack();
-            return fail("Please try again!", null);
+            return ResponseHelper::fail("Please try again!", null);
         }
     }
 
@@ -178,7 +181,7 @@ class ItemController extends Controller
                 $data = new ItemResource($item_new);
                 DB::commit();
 
-                return success('Success Created', $data);
+                return ResponseHelper::success('Success Created', $data);
             } else {
                 $item->category_id = $category_id;
                 $item->name = $name;
@@ -189,11 +192,11 @@ class ItemController extends Controller
                 $data = new ItemResource($item);
                 DB::commit();
 
-                return success('Success Updated', $data);
+                return ResponseHelper::success('Success Updated', $data);
             }
         } catch (Exception $ex) {
             DB::rollBack();
-            return fail("Please try again!", null);
+            return ResponseHelper::fail("Please try again!", null);
         }
     }
 
@@ -210,9 +213,9 @@ class ItemController extends Controller
         try {
             $item = Item::findOrFail($id);
             $item->delete();
-            return success('Success deleted', null);
+            return ResponseHelper::success('Success deleted', null);
         } catch (Exception $ex) {
-            return fail('Please try again!', null);
+            return ResponseHelper::fail('Please try again!', null);
         }
     }
 }

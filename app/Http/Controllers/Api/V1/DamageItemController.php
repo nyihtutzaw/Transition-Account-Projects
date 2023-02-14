@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Utils\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DamageItemResource;
 use App\Models\DamageItem;
@@ -95,7 +96,7 @@ class DamageItemController extends Controller
 
                 $old_stock = Stock::where('id', '=', $stock_id)->first();
                 if ($old_stock->quantity < $quantity) {
-                    return fail("Your Quantity is greater than In Stock..!", null);
+                    return ResponseHelper::fail("Your Quantity is greater than In Stock..!", null);
                 }
 
                 $old_stock->quantity -= $quantity;
@@ -104,7 +105,7 @@ class DamageItemController extends Controller
                 $data = new DamageItemResource($stock);
                 DB::commit();
 
-                return success('Successfully Created', $data);
+                return ResponseHelper::success('Successfully Created', $data);
             } else {
                 $stock->stock_id = $stock_id;
                 $stock->quantity += $quantity;
@@ -113,7 +114,7 @@ class DamageItemController extends Controller
 
                 $old_stock = Stock::where('id', '=', $stock_id)->first();
                 if ($old_stock->quantity < $quantity) {
-                    return fail("Your Quantity is greater than In Stock..!", null);
+                    return ResponseHelper::fail("Your Quantity is greater than In Stock..!", null);
                 }
                 $old_stock->quantity -= $quantity;
                 $old_stock->save();
@@ -121,11 +122,11 @@ class DamageItemController extends Controller
                 $data = new DamageItemResource($stock);
                 DB::commit();
 
-                return success('Successfull Updated', $data);
+                return ResponseHelper::success('Successfull Updated', $data);
             }
         } catch (Exception $ex) {
             DB::rollBack();
-            return fail("Please try again!", null);
+            return ResponseHelper::fail("Please try again!", null);
         }
     }
 
@@ -139,7 +140,7 @@ class DamageItemController extends Controller
     {
         $damage = DamageItem::findOrFail($id);
         $data = new DamageItemResource($damage);
-        return success('Success', $data);
+        return ResponseHelper::success('Success', $data);
     }
 
     /**
@@ -182,16 +183,16 @@ class DamageItemController extends Controller
 
             $old_stock = Stock::where('id', '=', $stock_id)->first();
             if ($old_stock->quantity < $quantity) {
-                return fail("Your Quantity is greater than In Stock..!", null);
+                return ResponseHelper::fail("Your Quantity is greater than In Stock..!", null);
             }
             $old_stock->quantity -= $quantity;
             $old_stock->save();
 
             $data = new DamageItemResource($item_new);
 
-            return success('Success Updated', $data);
+            return ResponseHelper::success('Success Updated', $data);
         } catch (Exception $ex) {
-            return fail("Please try again!", null);
+            return ResponseHelper::fail("Please try again!", null);
         }
     }
 
@@ -206,9 +207,9 @@ class DamageItemController extends Controller
         try {
             $item = DamageItem::findOrFail($id);
             $item->delete();
-            return success('Success deleted', null);
+            return ResponseHelper::success('Success deleted', null);
         } catch (Exception $ex) {
-            return fail('Please try again!', null);
+            return ResponseHelper::fail('Please try again!', null);
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Utils\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OutStockResource;
 use App\Models\OutStock;
@@ -28,8 +29,8 @@ class OutStockController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $out_stocks = $user->outStocks->sortByDesc('created_at');        
-        
+        $out_stocks = $user->outStocks->sortByDesc('created_at');
+
         $data = OutStockResource::collection($out_stocks);
         $perPage = request()->input('limit', 10);
         $currentPage = request()->input('page', 1);
@@ -98,7 +99,7 @@ class OutStockController extends Controller
 
                 $old_stock = Stock::where('id', '=', $stock_id)->first();
                 if ($old_stock->quantity < $quantity) {
-                    return fail("Your Quantity is greater than..!", null);
+                    return ResponseHelper::fail("Your Quantity is greater than..!", null);
                 }
                 $old_stock->quantity -= $quantity;
                 $old_stock->save();
@@ -106,7 +107,7 @@ class OutStockController extends Controller
                 $data = new OutStockResource($stock);
                 DB::commit();
 
-                return success('Successfully Created', $data);
+                return ResponseHelper::success('Successfully Created', $data);
             } else {
                 $stock->sender = $sender;
                 $stock->stock_id = $stock_id;
@@ -117,7 +118,7 @@ class OutStockController extends Controller
 
                 $old_stock = Stock::where('id', '=', $stock_id)->first();
                 if ($old_stock->quantity < $quantity) {
-                    return fail("Your Quantity is greater than..!", null);
+                    return ResponseHelper::fail("Your Quantity is greater than..!", null);
                 }
 
                 $old_stock->quantity -= $quantity;
@@ -126,11 +127,11 @@ class OutStockController extends Controller
                 $data = new OutStockResource($stock);
                 DB::commit();
 
-                return success('Successfull Updated', $data);
+                return ResponseHelper::success('Successfull Updated', $data);
             }
         } catch (Exception $ex) {
             DB::rollBack();
-            return fail("Please try again!", null);
+            return ResponseHelper::fail("Please try again!", null);
         }
     }
 
@@ -143,7 +144,7 @@ class OutStockController extends Controller
     public function show(OutStock $stock)
     {
         $data = new OutStockResource($stock);
-        return success('Success', $data);
+        return ResponseHelper::success('Success', $data);
     }
 
     /**
@@ -183,16 +184,16 @@ class OutStockController extends Controller
 
             $old_stock = Stock::where('id', '=', $stock_id)->first();
             if ($old_stock->quantity < $quantity) {
-                return fail("Your Quantity is greater than..!", null);
+                return ResponseHelper::fail("Your Quantity is greater than..!", null);
             }
 
             $old_stock->quantity -= $quantity;
             $old_stock->save();
 
             $data = new OutStockResource($stock);
-            return success('Success', $data);
+            return ResponseHelper::success('Success', $data);
         } catch (Exception $ex) {
-            return fail("Please try again!", null);
+            return ResponseHelper::fail("Please try again!", null);
         }
     }
 
@@ -207,9 +208,9 @@ class OutStockController extends Controller
         try {
             $item = OutStock::findOrFail($id);
             $item->delete();
-            return success('Success deleted', null);
+            return ResponseHelper::success('Success deleted', null);
         } catch (Exception $ex) {
-            return fail('Please try again!', null);
+            return ResponseHelper::fail('Please try again!', null);
         }
     }
 }

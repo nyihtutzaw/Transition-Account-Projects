@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Utils\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
@@ -96,9 +97,9 @@ class CategoryController extends Controller
             $category->save();
 
             $data = new CategoryResource($category);
-            return success('Success', $data);
+            return ResponseHelper::success('Success', $data);
         } catch (Exception $ex) {
-            return fail('Please try again!', null);
+            return ResponseHelper::fail('Please try again!', null);
         }
     }
 
@@ -111,7 +112,7 @@ class CategoryController extends Controller
     public function show(Category $category)
     {
         $data = new CategoryResource($category);
-        return success('Success', $data);
+        return ResponseHelper::success('Success', $data);
         // return fail('Unauthorized, Please try again!', null);
 
     }
@@ -143,9 +144,9 @@ class CategoryController extends Controller
             $category->user_id = $user->id;
             $category->save();
             $data = new CategoryResource($category);
-            return success('Successfully Updated', $data);
+            return ResponseHelper::success('Successfully Updated', $data);
         } catch (Exception $ex) {
-            return fail("Please try again!", null);
+            return ResponseHelper::fail("Please try again!", null);
         }
     }
 
@@ -160,9 +161,9 @@ class CategoryController extends Controller
         try {
             $category = Category::findOrFail($category->id);
             $category->delete();
-            return success('Success deleted', null);
+            return ResponseHelper::success('Success deleted', null);
         } catch (Exception $ex) {
-            return fail('Please try again!', null);
+            return ResponseHelper::fail('Please try again!', null);
         }
     }
 }
